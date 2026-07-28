@@ -97,4 +97,4 @@ The following accounts are seeded automatically on first run:
 
 ## License
 
-This project currently has no license specified — add one (e.g. MIT) if you plan to share or accept contributions.
+This project currently has developed for MP Online Project.
