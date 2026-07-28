@@ -1,0 +1,143 @@
+@model LMSystem.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    var spotlight = Model.NewArrivals.Count > 0 ? Model.NewArrivals[0] : null;
+}
+
+<!-- Hero: "Book of the Night" spotlight + quick search -->
+<section class="hero-glow">
+    <div class="hero-glow__content">
+        <p class="hero-eyebrow">Reading Room</p>
+        <h1 class="hero-title">Find your next book, see what everyone's reading, keep track of every due date.</h1>
+        <p class="hero-sub">@Model.AvailableBooks of @Model.TotalBooks titles are on the shelf right now.</p>
+
+        <form asp-controller="Books" asp-action="Index" method="get" class="hero-search">
+            <input type="text" name="searchQuery" class="hero-search__input" placeholder="Search by title, author, or ISBN&hellip;" />
+            <button type="submit" class="hero-search__btn">Search</button>
+        </form>
+
+        <a href="/Books/Index" class="hero-link">Or browse the full catalog &rarr;</a>
+    </div>
+
+    @if (spotlight != null)
+    {
+        <div class="hero-spotlight">
+            <span class="hero-spotlight__label">Latest Arrival</span>
+            @if (!string.IsNullOrWhiteSpace(spotlight.ISBN))
+            {
+                <img class="hero-spotlight__cover"
+                     src="https://covers.openlibrary.org/b/isbn/@(spotlight.ISBN)-L.jpg"
+                     alt=""
+                     loading="lazy"
+                     onerror="this.style.display='none'" />
+            }
+            <div class="hero-spotlight__text">
+                <span class="hero-spotlight__title">@spotlight.Title</span>
+                <span class="hero-spotlight__author">by @spotlight.Author</span>
+            </div>
+        </div>
+    }
+</section>
+
+<div class="container">
+
+    <!-- Trending Now: new functionality driven by real borrow counts -->
+    @if (Model.Trending.Count > 0)
+    {
+        <div class="row my-5">
+            <div class="col-12">
+                <h2 class="section-title">Trending Now</h2>
+                <p class="section-sub">The most-borrowed titles in the collection.</p>
+                <hr class="section-rule" />
+            </div>
+        </div>
+        <div class="trending-strip">
+            @foreach (var t in Model.Trending)
+            {
+                <a href="/Books/Details/@t.Book.BookId" class="trending-card">
+                    <span class="trending-card__rank">#@(Model.Trending.IndexOf(t) + 1)</span>
+                    @if (!string.IsNullOrWhiteSpace(t.Book.ISBN))
+                    {
+                        <img class="trending-card__cover"
+                             src="https://covers.openlibrary.org/b/isbn/@(t.Book.ISBN)-M.jpg"
+                             alt=""
+                             loading="lazy"
+                             onerror="this.style.display='none'" />
+                    }
+                    <span class="trending-card__title">@t.Book.Title</span>
+                    <span class="trending-card__count">@t.BorrowCount &times; borrowed</span>
+                </a>
+            }
+        </div>
+    }
+
+    <!-- New arrivals -->
+    <div class="row my-5">
+        <div class="col-12">
+            <h2 class="section-title">New Arrivals</h2>
+            <p class="section-sub">The latest additions to the catalog.</p>
+            <hr class="section-rule" />
+        </div>
+
+        @if (Model.NewArrivals.Count > 0)
+        {
+            @for (int i = 0; i < Model.NewArrivals.Count; i++)
+            {
+                var book = Model.NewArrivals[i];
+                var accents = new[] { "book-spine--ink", "book-spine--brass", "book-spine--burgundy" };
+                <div class="col-md-4 mb-4">
+                    <div class="book-spine @accents[i % accents.Length]">
+                        <div class="book-spine__cover">
+                            @if (!string.IsNullOrWhiteSpace(book.ISBN))
+                            {
+                                <img class="book-spine__cover-img"
+                                     src="https://covers.openlibrary.org/b/isbn/@(book.ISBN)-L.jpg"
+                                     alt=""
+                                     loading="lazy"
+                                     onerror="this.style.display='none'" />
+                            }
+                            <div class="book-spine__cover-scrim"></div>
+                            <div class="book-spine__cover-text">
+                                <span class="book-spine__title">@book.Title</span>
+                                <span class="book-spine__author">by @book.Author</span>
+                            </div>
+                        </div>
+                        <div class="book-spine__body">
+                            <p class="book-spine__meta mb-2">
+                                Published @book.PublishedDate.Year &middot; ISBN @book.ISBN
+                            </p>
+                            <span class="badge @(book.IsAvailable ? "bg-success" : "bg-danger") mb-3" style="width: fit-content;">
+                                @(book.IsAvailable ? "Available" : "Checked out")
+                            </span>
+                            <a href="/Books/Details/@book.BookId" class="btn btn-outline-brass btn-sm w-100 mt-auto">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="empty-state">
+                    <p class="mb-3">The catalog is empty right now.</p>
+                    <a href="/Books/Create" class="btn btn-brass btn-sm">Add the first book</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row my-5">
+        <div class="col-12">
+            <h2 class="section-title">Library Announcements</h2>
+            <hr class="section-rule" />
+        </div>
+        <div class="col-md-12">
+            <div class="announcement announcement--info">
+                <strong>New Arrivals:</strong> Check out the latest books added to our collection above.
+            </div>
+            <div class="announcement announcement--warning">
+                <strong>Library Hours Update:</strong> The library will be closed on public holidays.
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+## .NET / Visual Studio / VS Code
+
+# Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+out/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+.nuget/
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# macOS / Windows junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local secrets/config overrides (keep appsettings.json, ignore machine-specific overrides)
+appsettings.*.local.json
+appsettings.Development.json

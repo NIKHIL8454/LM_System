@@ -1,0 +1,98 @@
+@model LMSystem.Models.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    int totalForRatio = Model.AvailableBooks + Model.CheckedOutBooks;
+    double availablePct = totalForRatio > 0 ? (double)Model.AvailableBooks / totalForRatio * 100 : 0;
+}
+
+@if (TempData["message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="dash-head">
+    <p class="dash-eyebrow">// Overview</p>
+    <h1 class="dash-title">Front Desk</h1>
+    <p class="dash-sub">A working snapshot of the collection, the members, and what moved most recently.</p>
+</div>
+
+<!-- Key metrics ledger strip -->
+<div class="dash-metrics">
+    <div class="dash-metric dash-metric--lead">
+        <span class="dash-metric__label">Books in catalog</span>
+        <span class="dash-metric__value">@Model.TotalBooks</span>
+    </div>
+    <div class="dash-metric">
+        <span class="dash-metric__label">Students</span>
+        <span class="dash-metric__value">@Model.TotalStudents</span>
+    </div>
+    <div class="dash-metric">
+        <span class="dash-metric__label">Librarians</span>
+        <span class="dash-metric__value">@Model.TotalLibrarians</span>
+    </div>
+    <div class="dash-metric">
+        <span class="dash-metric__label">Borrow records</span>
+        <span class="dash-metric__value">@Model.TotalBorrowings</span>
+    </div>
+    <div class="dash-metric">
+        <span class="dash-metric__label">Publications</span>
+        <span class="dash-metric__value">@Model.TotalPublications</span>
+    </div>
+</div>
+
+<div class="dash-grid">
+    <!-- Collection overview panel -->
+    <section class="dash-panel">
+        <h2 class="dash-panel__title">Collection Overview</h2>
+        <p class="dash-panel__sub">How much of the catalog is on the shelf right now.</p>
+
+        <div class="dash-ratio">
+            <div class="dash-ratio__bar">
+                <div class="dash-ratio__fill" style="width: @(availablePct.ToString("0.0"))%;"></div>
+            </div>
+            <div class="dash-ratio__labels">
+                <span><span class="dash-dot dash-dot--available"></span> Available &mdash; @Model.AvailableBooks</span>
+                <span><span class="dash-dot dash-dot--checked-out"></span> Checked out &mdash; @Model.CheckedOutBooks</span>
+            </div>
+        </div>
+
+        <div class="dash-actions">
+            <a asp-controller="Books" asp-action="Create" class="btn btn-primary btn-sm">Add a Book</a>
+            <a asp-controller="Student" asp-action="Create" class="btn btn-secondary btn-sm">Add a Student</a>
+            <a asp-controller="Publications" asp-action="Index" asp-route-type="Newspaper" class="btn btn-secondary btn-sm">View Publications</a>
+        </div>
+    </section>
+
+    <!-- Recent activity panel -->
+    <section class="dash-panel dash-panel--wide">
+        <h2 class="dash-panel__title">Recent Activity</h2>
+        <p class="dash-panel__sub">The last @Model.RecentActivity.Count borrow/return entries.</p>
+
+        @if (Model.RecentActivity.Count > 0)
+        {
+            <ul class="dash-feed">
+                @foreach (var item in Model.RecentActivity)
+                {
+                    <li class="dash-feed__item">
+                        <span class="dash-feed__stamp @(item.IsReturned ? "dash-feed__stamp--returned" : "dash-feed__stamp--out")">
+                            @(item.IsReturned ? "Returned" : "Borrowed")
+                        </span>
+                        <div class="dash-feed__body">
+                            <span class="dash-feed__title">@item.BookTitle</span>
+                            <span class="dash-feed__meta">@item.BorrowerName &middot; @item.BorrowDate.ToString("MMM d, yyyy")</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p class="mb-0">No borrow activity yet.</p>
+            </div>
+        }
+    </section>
+</div>
