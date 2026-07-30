@@ -97,4 +97,4 @@ The following accounts are seeded automatically on first run:
 
 ## License
 
-This project currently has developed for MP Online Project.
+This project currently has developed for MP Online Internship Project.
